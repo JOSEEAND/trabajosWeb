@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{datosUsuarios}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.idemp is string &&
+                       request.resource.data.usuario is string &&
+                       request.resource.data.email is string;
+      allow update: if true;
+      allow delete: if false;
+    }
+    match /{Categories}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.CategoryID is int &&
+                       request.resource.data.CategoryName is string &&
+                       request.resource.data.Description is string &&
+                       request.resource.data.urlImage is string;
+      allow update: if false;
+      allow delete: if false;
+    }
+    match /{Customers}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.CustomerID is string &&
+                       request.resource.data.CompanyName is string &&
+                       request.resource.data.ContactName is string &&
+                       request.resource.data.ContactTitle is string &&
+                       request.resource.data.Address is string &&
+                       request.resource.data.City is string &&
+                       request.resource.data.Region is string &&
+                       request.resource.data.PostalCode is string &&
+                       request.resource.data.Country is string &&
+                       request.resource.data.Phone is string &&
+                       request.resource.data.Fax is string;
+      allow update: if false;
+      allow delete: if false;
+    }
+    match /{Employees}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.EmployeeID is int &&
+                       request.resource.data.LastName is string &&
+                       request.resource.data.FirstName is string &&
+                       request.resource.data.Title is string &&
+                       request.resource.data.TitleOfCourtesy is string &&
+                       request.resource.data.BirthDate is timestamp &&
+                       request.resource.data.HireDate is timestamp &&
+                       request.resource.data.Address is string &&
+                       request.resource.data.City is string &&
+                       request.resource.data.Region is string &&
+                       request.resource.data.PostalCode is string &&
+                       request.resource.data.Country is string &&
+                       request.resource.data.HomePhone is string &&
+                       request.resource.data.Extension is int &&
+                       request.resource.data.Photo is string &&
+                       request.resource.data.Notes is string &&
+                       request.resource.data.ReportsTo is int;
+      allow update: if false;
+      allow delete: if false;
+    }
+    match /{Products}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.ProductID is int &&
+                       request.resource.data.ProductName is string &&
+                       request.resource.data.SupplierID is int &&
+                       request.resource.data.CategoryID is int &&
+                       request.resource.data.QuantifyPerUnit is string &&
+                       request.resource.data.UnitPrice is float &&
+                       request.resource.data.UnitsInStock is int &&
+                       request.resource.data.UnitsOnOrder is int &&
+                       request.resource.data.ReorderLevel is int &&
+                       request.resource.data.Discontinued is int;
+      allow update: if false;
+      allow delete: if false;
+    }
+    match /{Orders}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.OrderID is int &&
+                       request.resource.data.CustomerID is string &&
+                       request.resource.data.EmployeeID is int &&
+                       request.resource.data.OrderDate is timestamp &&
+                       request.resource.data.RequiredDate is timestamp &&
+                       request.resource.data.ShippedDate is timestamp &&
+                       request.resource.data.ShipVia is int &&
+                       request.resource.data.Freight is float &&
+                       request.resource.data.ShipName is string &&
+                       request.resource.data.ShipAddress is string &&
+                       request.resource.data.ShipCity is string &&
+                       request.resource.data.ShipRegion is string &&
+                       request.resource.data.ShipPostalCode is string &&
+                       request.resource.data.ShipCountry is string;
+      allow update: if false;
+      allow delete: if false;
+    }
+    match /{Order_Details}/{document=**}{
+      allow read:if true;
+      allow create: if request.resource.data.OrderID is int &&
+                       request.resource.data.ProductID is int &&
+                       request.resource.data.UnitPrice is float &&
+                       request.resource.data.Quantity is int &&
+                       request.resource.data.Discount is float;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

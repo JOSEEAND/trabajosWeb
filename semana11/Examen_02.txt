@@ -1,0 +1,16 @@
+https://phpafirebase-1458e.web.app/index.html
+
+
+usuarios:
+josean@gmail.com
+123456
+
+york@gmail.com
+123456
+
+cuando presiona autenticar ya puede acceder a los
+elementos del menu
+
+las reglas estan bien ya que al subir los archivos
+en la firestore database se muestran las nuevas
+colecciones

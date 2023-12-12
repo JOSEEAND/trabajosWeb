@@ -1,0 +1,4 @@
+https://github.com/Remma27/test01/blob/main/public/registrar.html
+
+
+https://console.firebase.google.com/u/0/project/test01-fd283/hosting/sites/test01-fd283

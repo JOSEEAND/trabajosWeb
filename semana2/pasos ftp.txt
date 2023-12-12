@@ -1,0 +1,124 @@
+========================================================================================
+Study Center....: Universidad Técnica Nacional
+Campus..........: Pacífico
+College career..: Tecnologías de Información
+Course..........: ITI-522 - Computación en la Nube
+School period...: 2-2023
+Document........: Install 
+Goals...........: Install VSFTP service with local user.
+Professor.......: Jorge Ruiz (york)
+Student.........: 
+========================================================================================
+
+01 - Instalar y configurar servicio de FTP
+
+	apt-get install vsftpd
+
+	mkdir /etc/vsftpd
+	mkdir /etc/vsftpd/vacio
+	nano /etc/vsftpd/chroot_list		Este archivo se deja en blanco
+
+			salvar documento: ctrl + o 
+			salir documento:  ctrl + x
+		
+	nano /etc/shells
+		Agregar al final la línea:
+
+			/bin/false
+
+		salvar documento: ctrl + o 
+		salir documento:  ctrl + x
+
+
+	Se procede a modificar el archivo vsftpd.conf, para configurar el comportamiento que 
+	habrá de tener el servicio de FTP.
+
+
+	nano /etc/vsftpd.conf
+
+		La siguiente es una lista de las variables que deben modificarse y mantenerse activas 
+		para que el servicio de FTP funcione como se espera.  Las variables se configuran de 
+		acorde a su aparición de principio a fin.
+		
+
+			listen=NO
+			anonymous_enable=NO
+			write_enable=YES
+			local_umask=022
+
+			dirmessage_enable=YES
+			use_localtime=YES
+			xferlog_enable=YES
+
+			connect_from_port_20=YES
+			xferlog_file=/var/log/vsftpd.log
+			ftpd_banner=<Mensaje que me interesa presentar>    opcional
+
+			chroot_local_user=YES 		 configurar la segunda
+			chroot_list_enable=YES
+			allow_writeable_chroot=YES		agregar esta línea no existe
+
+			chroot_list_file=/etc/vsftpd/chroot_list
+			secure_chroot_dir=/etc/vsftpd/vacio
+			pam_service_name=vsftpd
+
+
+			agregar estas instrucciones al final del archivo
+			local_max_rate=2097152	
+			max_clients=100
+			max_per_ip=10
+
+
+		salvar documento: ctrl + o 
+		salir documento:  ctrl + x
+
+
+02 - Reiniciar el servicio de vsftpd
+	
+	/etc/init.d/vsftpd restart
+
+	apt install nmap
+
+		Utilizando nmap + [ip de su servidor], deberían de observarse los puertos:
+			80 para http
+			22 para ssh
+			21 para ftp
+
+
+		Si el puerto 21 no aparece en la lista, se debe revisar la configuración del 
+		servicio de ftp
+
+
+03 - Configurar las cuentas de los usuarios de FTP
+
+	mkdir /home/ftpusers	carpeta física donde se grabarán los archivos de los usuarios
+	mkdir /utiles			carpeta que contendrá archivos batch de uso continuo
+
+	nano /utiles/addftpuser.sh	
+	
+		Escribir el siguiente código
+
+		mkdir /home/ftpusers/$1
+		groupadd $1
+		useradd -d /home/ftpusers/$1 -s /bin/false -g $1 $1
+		chown -R $1:$1 /home/ftpusers/$1
+		chmod -R 755 /home/ftpusers/$1
+		passwd $1
+		ln /home/ftpusers/$1 /var/www/html/$1 -s
+
+
+		salvar documento: ctrl + o 
+		salir documento:  ctrl + x
+
+
+	chmod +x  /utiles/addftpuser.sh
+
+
+04. Validar función del batch anterior:
+
+	/utiles/./addftpuser.sh <usuario de prueba>
+	
+	Asignar contraseña y validarla (ojo no se mira cuando se escribe)
+
+
+05. Abrir el Filezilla Client en Windows y probar datos de autentificación

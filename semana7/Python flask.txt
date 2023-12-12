@@ -1,0 +1,563 @@
+Universidad Técnica Nacional
+Sede......: Pacífico
+Carrera...: Tecnologías de Información
+Curso.....: ITI-621 - Sistemas y Tecnologías Web III
+Profesor..: Jorge Ruiz (york)
+Periodo...: 3-2023
+
+================================================================
+Lista de videos de acorde a los pasos a seguir
+================================================================
+
+              Pasos       
+---------------------------------------------------------------------
+Video 01 -> (01 - 04) -> https://www.youtube.com/watch?v=3lNtDA9GW5o
+Video 02 -> (05 - 08) -> https://www.youtube.com/watch?v=8pQdcccNF5A
+Video 03 -> (09 - 13) -> https://www.youtube.com/watch?v=mMN_I-tX0cY
+Video 04 -> (14 - 17) -> https://www.youtube.com/watch?v=22MsKZy8SVY
+Vide0 05 -> (18 - 20) -> https://www.youtube.com/watch?v=3Wgd-mOqMzE
+
+
+================================================================
+Creación de una aplicación Web con Python y la librería Flask 
+================================================================
+
+Paso 01 - Creación de la base de datos.
+
+	Ingresar al SQL-Server de Microsoft
+	- Ejecutar el siguiente script
+    
+        Create database datos;
+		go
+	
+		use datos
+		go
+
+		create table datos(
+			id smallint not null identity(1,1) primary key,
+			texto varchar(50) not null,
+			descripcion varchar(120) not null
+		);
+		go
+
+
+Paso 02 - Creción de la aplicación de ejemplo (PyCharm o Visual Code)
+
+	Crear las siguientes carpetas
+	
+		- data
+		- static
+			- css
+			- js
+		- templates
+		
+	Asegurarse que esta instaldas las herramientas
+		- en la consola ejecutar del pyCharm :
+		
+			pip install flask
+			pip install pyodbc
+			
+			
+Paso 03 - Creación de la clase clsDatos()
+
+	En la carpteta data:
+	
+		class clsDatos():
+			# Constructor function
+			def __init__(self, id=None, texto=None, descripcion=None):
+				self._id = id
+				self._text = texto
+				self._descrip = descripcion
+
+			# Local get/set function set
+			def _getID(self):
+				return self._id
+
+			def _setID(self, id):
+				self._id = id
+
+			def _getText(self):
+				return self._text
+
+			def _setText(self,texto):
+				self._text = texto
+
+			def _getDescrip(self):
+				return self._descrip
+
+			def _setDescrip(self,descripcion):
+				self._descrip = descripcion
+
+			# Encapsulated property
+			ID = property(_getID, _setID)
+			Texto = property(_getText, _setText)
+			Descripcion = property(_getDescrip, _setDescrip)
+	
+	
+Paso 04 - Creación de la clase clsConexion() 
+
+	En la carpteta data:
+	
+		import pyodbc
+		from data.clsDatos import clsDatos
+
+		class clsConexion():
+			# Declara las variables para la conexion
+			_servidor = '10.236.2.114'   # Recuerde cambiar la dirección y contraseña
+			_basedatos = 'datos'
+			_usuario = 'sa'
+			_contra = 'parda99*'
+
+			def __init__(self):
+				pass
+
+			def _conectar(self):
+				try:
+					_conex = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
+										   'SERVER=' + self._servidor +
+										   ';DATABASE=' + self._basedatos +
+										   ';UID=' + self._usuario +
+										   ';PWD=' + self._contra)
+				except Exception as err:
+					print(err)
+				return _conex
+
+
+			def agregar(self, dato):
+				estado = False
+				AuxSql = "insert into datos(texto, descripcion) values('{0}','{1}')".format(dato.Texto, dato.Descripcion)
+				try:
+					_conex = self._conectar()
+					with _conex.cursor() as cursor:
+						cursor.execute(AuxSql)
+
+					_conex.close()
+					estado = True
+				except Exception as err:
+					print(err)
+				return estado
+
+
+			def editar(self, dato):
+				estado = False
+				AuxSql = "update datos set texto = '{1}', descripcion = '{2}' where id = {0}".format(dato.ID, dato.Texto, dato.Descripcion)
+				try:
+					_conex = self._conectar()
+					with _conex.cursor() as cursor:
+						cursor.execute(AuxSql)
+
+					_conex.close()
+					estado = True
+				except Exception as err:
+					print(err)
+				return estado
+
+
+			def borrar(self, ide):
+				estado = False
+				AuxSql = "delete datos where id = {0}".format(ide)
+				try:
+					_conex = self._conectar()
+					with _conex.cursor() as cursor:
+						cursor.execute(AuxSql)
+
+					_conex.close()
+					estado = True
+				except Exception as err:
+					print(err)
+				return estado
+
+
+			def consultar(self, ide=None):
+				data = ''
+				salida = []
+
+				try:
+					_conex = self._conectar()
+					with _conex.cursor() as cursor:
+						if ide is None:
+							cursor.execute("Select * from datos")
+						else:
+							cursor.execute("Select * from datos where id = {0}".format(ide))
+						data = cursor.fetchall()
+
+					_conex.close()
+				except Exception as err:
+					print(err)
+
+				for tupla in data:
+					salida.append(clsDatos(tupla[0], tupla[1], tupla[2]))
+
+				return salida
+	
+	
+Paso 05 - Creación de la plantilla para html
+
+    En la carpeta templates crear el archivo: layout.html
+
+        <!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport"
+                  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+            <!-- CSS only -->
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+                  integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+            <!-- JS, Popper.js, and jQuery -->
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+                    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+                    crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+                    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+                    crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+                    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+                    crossorigin="anonymous"></script>
+
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+
+            {% block titulo %}
+            {% endblock %}
+        </head>
+        <body class="container-fluid">
+            <header class="col-md-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="#">Navbar</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Página 1</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <main class="col-md-12">
+                <div class="container">
+                    {% block contenido %}
+                    {% endblock %}
+                </div>
+            </main>
+
+            <footer class="col-md-12">
+
+            </footer>
+
+        </body>
+        </html>
+
+
+Paso 06 - Creación de la index.html
+
+    En la carpeta templates crear el archivo: index.html
+    
+        {% extends "layout.html"%}
+
+        {% block titulo %}            
+            <title>Hecho con Flask</title>
+        {% endblock %}
+
+
+        {% block contenido %}
+            <h3>Control de datos con Flask</h3>
+            <br />
+            <h5>Datos</h5>
+            <table class="table ">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Título</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Controles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   {% for dato in datos %}
+                        <tr>
+                            <th scope="row">{{ dato.ID}}</th>
+                            <td>{{ dato.Texto}}</td>
+                            <td>{{ dato.Descripcion}}</td>
+                            <td>
+                                <button class="btn btn-outline-success btn-sm">Editar</button>
+                                <button class="btn btn-outline-danger btn-sm">Borrar</button>
+                            </td>
+                        </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+            <hr />
+            <a class="btn btn-outline-primary btn-sm">Agregar dato</a>
+        {% endblock %}
+        
+
+Paso 07 - Creación de la aplicación que crea el sitio
+
+    Crear el archivo appSitio.py
+    
+        from flask import Flask, render_template, request, redirect, url_for
+        app = Flask(__name__)
+        
+
+        from data.clsConexion import clsConexion
+        from data.clsDatos import clsDatos
+        conex = clsConexion()
+
+        
+        @app.route('/')
+        def index():
+            return render_template('index.html', datos=conex.consultar())
+
+
+        if __name__ == '__main__':
+            app.run(host='0.0.0.0', port=5001, debug=True)
+
+
+Paso 08 - Crear algunos datos de prueba
+
+    En el SQL-Server usando la base de datos "datos"
+    
+        insert into datos(texto, descripcion) 
+        values('Godzilla', 'Dinosaurio radiactivo protector de Tokio.'),
+              ('Poletergeish','Fantasmas que estan atrapados en la realidad.'),
+              ('Valiente','Historia de lazos rotos y restaurados.'),
+              ('Dark','Relato de la paradoja del tiempo y espacio');
+        go
+    
+
+	
+Recuerde probar el sitio
+
+
+Paso 09 - Agregar librerias necesarias para los CRUD.
+
+    En la carpeta static\js copiar los siguientes archivos suministrados
+    en el archivo jqueries.zip
+    
+        - jquery-3.5.1.js
+        - jquery-3.5.1.min.map
+        
+
+Paso 10 - Agregar script js para agregar registro.
+    
+    En la carpeta static\js crear el archivo "agregarRegistro.js"
+    
+        $(function() {
+            $('#btnAgregar').click(function() {
+                $.ajax({
+                    url: '/agregar',
+                    data: $('form').serialize(),
+                    type: 'POST',
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });   
+    
+
+Paso 11 - Crear la página para agregar un registro.
+
+    En la carpeta templates crear el archivo: "agregar.html"
+    
+        {% extends "layout.html"%}
+
+        {% block titulo %}
+            <script src="../static/js/jquery-3.5.1.js"></script>
+            <script src="../static/js/agregarRegistro.js"></script>
+            <title>Agregar datos con Flask</title>
+        {% endblock %}
+
+        {% block contenido %}
+            <h3>Agregando nuevo registro con Flask</h3>
+            <br />
+            <form class="form" action="/">
+                <div class="from-group row">
+                    <label for="" class="col-sm-2 col-form-label"><strong>Texto</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="txtTexto" name="txtTexto" class="form-control" required>
+                    </div>
+                </div>
+                <div class="from-group row">
+                    <label for="" class="col-sm-2 col-form-label"><strong>Descripción</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="txtDescrip" name="txtDescrip" class="form-control" required>
+                    </div>
+                </div>
+                <br />
+                <button type="submit" id="btnAgregar" class="btn btn-primary" >Agregar</button>
+            </form>
+        {% endblock %}  
+    
+        
+Paso 12 - Modifificar el archivo de la aplicación para agregar Insertar            
+
+    Modificar el archivo appSitio.py y agegregar después de la index()
+    
+        @app.route('/agregar', methods=['GET', 'POST'])
+        def agregar():
+            if request.method == "POST":
+                if conex.agregar(clsDatos(0, request.form['txtTexto'], request.form['txtDescrip'])):
+                    app.logger.debug("Datos almacenados correctamente")
+                else:
+                    app.logger.debug("Se presentó un problema con los datos")
+                return redirect(url_for("index"))
+            else:
+                return render_template('agregar.html')
+
+
+Paso 13 - Actualizar la página index.html    
+
+    Modificar el boton de agregar registro, sustituya por la siguiente línea
+
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('agregar') }}">Agregar dato</a>
+    
+    
+Recuerde probar su sitio, ya debería poder ingresar un nuevo dato
+
+    
+Paso 14 - Agregar script js para editar registro.
+
+    En la carpeta static\js crear el archivo "modificarRegistro.js"
+    
+        $(function() {
+            $('#btnModificar').click(function() {
+                $.ajax({
+                    url: '/exec_modificar',
+                    data: $('form').serialize(),
+                    type: 'POST',
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    
+    
+Paso 15 - Crear página para modificar registro.
+
+    En la carpeta templates crear el archivo: "modificar.html"
+    
+        {% extends "layout.html"%}
+
+        {% block titulo %}
+            <script src="../static/js/jquery-3.5.1.js"></script>
+            <script src="../static/js/modificarRegistro.js"></script>
+            <title>Modificar datos con Flask</title>
+        {% endblock %}
+
+        {% block contenido %}
+            <h3>Actualizando registro con Flask</h3>
+            <br />
+            {% for dato in datos %}
+            <form class="form" action="/" >
+                <div class="from-group row">
+                    <label for="" class="col-sm-2 col-form-label"><strong>ID</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" disabled value="{{ dato.ID}}">
+                    </div>
+                </div>
+                <div class="from-group row">
+                    <label for="" class="col-sm-2 col-form-label"><strong>Texto</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="txtTexto" name="txtTexto" class="form-control" required value="{{ dato.Texto}}">
+                    </div>
+                </div>
+                <div class="from-group row">
+                    <label for="" class="col-sm-2 col-form-label"><strong>Descripción</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" id="txtDescrip" name="txtDescrip" class="form-control" required value="{{ dato.Descripcion}}">
+                    </div>
+                </div>
+                <br />
+                <button type="submit" id="btnModificar" class="btn btn-primary" >Modificar</button>
+                <input type="hidden" id="txtID" name="txtID" class="form-control" value="{{ dato.ID}}">
+            </form>
+            {% endfor %}
+        {% endblock %}
+    
+    
+Paso 16 - Modifificar el archivo de la aplicación para agregar Modificar            
+
+    Modificar el archivo appSitio.py y agegregar despues de agregar()
+
+        @app.route('/modificar/<int:ide>', methods=['GET'])
+        def modificar(ide):
+            return render_template('modificar.html', datos=conex.consultar(ide))
+
+
+        @app.route('/exec_modificar', methods=['POST'])
+        def exec_modificar():
+            if conex.editar(clsDatos(request.form['txtID'], request.form['txtTexto'], request.form['txtDescrip'])):
+                app.logger.debug("Datos modificados correctamente")
+            else:
+                app.logger.debug("Se presentó un problema con los datos")
+            return redirect(url_for('index'))
+
+
+Paso 17 - Actualizar la página index.html (otra vez)
+
+    Modificar el boton de editar registro, sustituya por la siguiente línea (se encuentra en la lista de textos)   
+
+        <button class="btn btn-outline-success btn-sm" onclick="modificar({{ dato.ID }})">Editar</button>
+    
+    
+    Agregar javascript para invocar ventana de edición, puede ir antes del título de la página.
+
+        <script >
+            function modificar(ide){
+                window.location.href = "/modificar/" + ide;
+            }
+        </script>
+
+
+Recuerde probar su sitio, ya debería poder modificar un registro
+
+
+Paso 18 - Modifificar el archivo de la aplicación para agregar Eliminar
+
+    Modificar el archivo appSitio.py y agegregar despues de exec_modificar()
+        
+        @app.route('/exec_eliminar/<int:ide>', methods=['GET'])
+        def exec_eliminar(ide):
+            if conex.borrar(ide):
+                app.logger.debug("Datos eliminado correctamente")
+            else:
+                app.logger.debug("Se presentó un problema con los datos")
+            return redirect(url_for('index'))
+        
+        
+Paso 19 - Actualizar la página index.html (una tercera vez)
+
+    Modificar el boton de eliminar registro, sustituya por la siguiente línea (se encuentra en la lista de textos)
+    
+        <button class="btn btn-outline-danger btn-sm" onclick="borrar({{ dato.ID }})">Borrar</button>
+        
+        
+    Agregar al javascript el siguiente código. (el script se creó en el paso 17)
+    
+        function borrar(ide){
+            window.location.href = "/exec_eliminar/" + ide;
+        }
+     
+	 
+Recuerde probar su sitio, ya debería poder borrar un registro    
+
+
+Paso 20 - Recuerde ser feliz, disfrutar la vida y que la familia es lo mas importante en nuestras vidas. 

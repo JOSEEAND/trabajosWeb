@@ -1,0 +1,45 @@
+ssh jose@192.168.0.10
+
+name, username: jose
+server name: laboratorio
+password: servidores2023
+index.nginx-debian.html
+
+
+//entrar a mysql
+mysql -u root -p
+servidores2023
+
+
+//drupal
+usuario
+servidores2023
+
+josenun384@gmail.com
+jose
+servidores2023
+
+
+//wordpress
+josenun384@gmail.com
+FFAp1EIhW8!2k&c##7
+
+
+//ftp
+user1 contra12
+usuario1 servidores
+usuario2 servidores2023
+usuario3 servidores1902
+
+
+//instalados:
+nginx
+nmap
+php
+net-tools
+curl
+mysql
+drupal
+wordpress
+unzip
+ftp

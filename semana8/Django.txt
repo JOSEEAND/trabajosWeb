@@ -1,0 +1,58 @@
+https://github.com/Ale021217/django.git
+
+Es un ejemplo de tareas, un crud completo con un login
+
+Paso a paso de las cosas que se tiene que instalar
+1-Ubicarse en su carpeta, ya sea en cmd o cualquier otra terminla
+
+
+2-Instalar el entorno virtual
+py -m venv venv
+Verificar si está dentro del entorno, se abre una terminal y al inicia debería de salir
+(venv)
+
+3-Instalar django
+pip install django
+
+4-Crear proyecto
+django-admin startproject djangocrud
+
+5-Para correr el proyecto
+python manage.py runserver
+
+6-Crear aplicaciones
+python manage.py startapp tasks
+*Esto hace que se cree una carpeta llamada tasks que contiene todas 
+las aplicaciones(se puede llamar patitos si quiere)
+
+7-Se tiene que añadir la carpeta a la configuracion general
+Se ingresa a settings.py
+INSTALLED_APS
+Al final se añade
+'tasks'
+
+Con esto ya se crea el proyecto y se puede empezar a trabajar.
+
+
+La carpeta models.py es donde se hace la tabla de la BD
+
+from django.db import models
+
+from django.contrib.auth.models import User
+
+# Create your models here.
+class Task(models.Model):
+    titulo = models.CharField(max_length=100)
+    descripcion= models.TextField(blank=True)
+    creacion= models.DateTimeField(auto_now_add=True)
+    fechaCompletada= models.DateTimeField(null=True, blank=True)
+    importancia= models.BooleanField(default=False)
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+     
+    def __str__(self):
+        return self.titulo + '- by ' + self.user.username
+
+Ese es el codigo
+
+
+
